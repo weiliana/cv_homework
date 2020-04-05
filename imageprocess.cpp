@@ -33,7 +33,7 @@ void ImageProcess::sift()
 
 }
 
-void ImageProcess::suft()
+void ImageProcess::surf()
 {
 
 }
