@@ -114,7 +114,7 @@ void MainWindow::on_FERNS_btn_clicked()
         ImageProcess::sift();
         break;
     case 1:
-        ImageProcess::suft();
+        ImageProcess::surf();
         break;
     }
 
