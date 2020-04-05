@@ -17,7 +17,7 @@ public:
 
     // opencv中有可以调用的函数时，用opencv的进行替换
     static void sift();                 //在具体功能中根据索引调用具体的特征提取方法和具体的特征匹配方法
-    static void suft();
+    static void surf();
     static void bruteForce();
     static void FLANN();
     static void RANSAC();
