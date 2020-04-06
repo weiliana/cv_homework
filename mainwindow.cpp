@@ -7,7 +7,10 @@
 #include <QFileDialog>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/types_c.h>
+#include <opencv2/xfeatures2d.hpp>
 using namespace cv;
+using namespace cv::xfeatures2d;
+using namespace std;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -194,5 +197,51 @@ void MainWindow::on_videoOpen_btn_clicked()
 
         setMsg("video file has opened.");
     }
+
+}
+
+void MainWindow::on_testFeatureSelection_btn_clicked()
+{
+    if(image1.isNull())
+    {
+        this->setMsg("Image 1 is null!");
+        return;
+    }
+    String path = ui->ImagePath1->text().toStdString();
+    Mat src = imread(path,IMREAD_GRAYSCALE);
+    //namedWindow("test feature", WINDOW_NORMAL);
+    imshow("Origin Image", src);
+
+    // 特征点检测
+    int minHessian = 100;
+    vector<KeyPoint> keyPoints;
+    String type;
+    if(featureSelectionIndex == 0)
+    {
+        // SIFT
+        type = "SIFT ";
+        Ptr<SIFT> detector = SIFT::create(minHessian);
+        detector->detect(src, keyPoints, Mat());
+    }
+    else if(featureSelectionIndex == 1)
+    {
+        // SURF
+        type = "SURF ";
+        Ptr<SURF> detector = SURF::create(minHessian);
+        detector->detect(src, keyPoints, Mat());
+    }
+    // 绘制关键点
+    Mat keypoint_img;
+    drawKeypoints(src, keyPoints, keypoint_img);
+    imshow(type + "KeyPoints Image", keypoint_img);
+}
+
+void MainWindow::on_testRANSAC_btn_clicked()
+{
+
+}
+
+void MainWindow::on_testFeatureMatch_btn_clicked()
+{
 
 }

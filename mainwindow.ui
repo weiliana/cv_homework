@@ -184,6 +184,13 @@
               </item>
              </widget>
             </item>
+            <item>
+             <widget class="QPushButton" name="testFeatureSelection_btn">
+              <property name="text">
+               <string>中间结果测试</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
@@ -215,6 +222,13 @@
              <widget class="QCheckBox" name="ransacCheckBox">
               <property name="text">
                <string>RANSAC</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="testRANSAC_btn">
+              <property name="text">
+               <string>中间结果测试</string>
               </property>
              </widget>
             </item>
@@ -263,6 +277,13 @@
                 <string>FLANN</string>
                </property>
               </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="testFeatureMatch_btn">
+              <property name="text">
+               <string>中间结果测试</string>
+              </property>
              </widget>
             </item>
            </layout>

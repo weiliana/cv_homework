@@ -51,5 +51,8 @@ private slots:
     void on_videoDetectFunc_cmb_currentIndexChanged(int index);//用什么方法处理视频
     void on_videoPath_returnPressed();
     void on_videoOpen_btn_clicked();    //输入视频
+    void on_testFeatureSelection_btn_clicked();
+    void on_testRANSAC_btn_clicked();
+    void on_testFeatureMatch_btn_clicked();
 };
 #endif // MAINWINDOW_H
