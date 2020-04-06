@@ -200,6 +200,17 @@ void MainWindow::on_videoOpen_btn_clicked()
 
 }
 
+QString str2qstr(const string str)
+{
+    return QString::fromLocal8Bit(str.data());
+}
+
+string qstr2str(const QString qstr)
+{
+    QByteArray cdata = qstr.toLocal8Bit();
+    return string(cdata);
+}
+
 void MainWindow::on_testFeatureSelection_btn_clicked()
 {
     if(image1.isNull())
@@ -207,7 +218,7 @@ void MainWindow::on_testFeatureSelection_btn_clicked()
         this->setMsg("Image 1 is null!");
         return;
     }
-    String path = ui->ImagePath1->text().toStdString();
+    String path = qstr2str(ui->ImagePath1->text());
     Mat src = imread(path,IMREAD_GRAYSCALE);
     //namedWindow("test feature", WINDOW_NORMAL);
     imshow("Origin Image", src);
