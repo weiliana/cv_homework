@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_1">
        <property name="font">
@@ -386,6 +386,27 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_10">
         <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_9">
+          <item>
+           <widget class="QLabel" name="label_10">
+            <property name="text">
+             <string>目标图片</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="videoTargetImgPath"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="videoTargetImg_btn">
+            <property name="text">
+             <string>选择图片</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
          <layout class="QHBoxLayout" name="horizontalLayout_7">
           <item>
            <widget class="QLabel" name="label_9">
@@ -421,11 +442,6 @@
           </item>
           <item>
            <widget class="QComboBox" name="videoDetectFunc_cmb">
-            <item>
-             <property name="text">
-              <string>FAST</string>
-             </property>
-            </item>
             <item>
              <property name="text">
               <string>ORB</string>

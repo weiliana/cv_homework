@@ -20,12 +20,14 @@ public:
     QImage image1;
     QImage image2;
     QImage result;
+
     int featureSelectionIndex;  //指示当前特征提取用的是哪个方法
     int featureMatchIndex;      //指示当前特征提取用的是哪个方法
     int videoProcIndex;
     int Hessian;
     bool is_RANSAC_checked;     //指示要不要去除野点
     QString videoPath;          //视频路径
+    QString videoMacthTargetPath;
 
     void setMsg(QString msg);   //向文本框输出信息
 
@@ -54,5 +56,6 @@ private slots:
     void on_testFeatureSelection_btn_clicked();
     void on_testRANSAC_btn_clicked();
     void on_testFeatureMatch_btn_clicked();
+    void on_videoTargetImg_btn_clicked();
 };
 #endif // MAINWINDOW_H

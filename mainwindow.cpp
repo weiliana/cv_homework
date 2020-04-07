@@ -3,10 +3,10 @@
 #include "imageprocess.h"
 #include "videoprocess.h"
 #include "methodvalidate.h"
+#include "utils.h"
 #include <QDebug>
 #include <QFileDialog>
 #include <opencv2/opencv.hpp>
-#include <opencv2/imgproc/types_c.h>
 #include <opencv2/xfeatures2d.hpp>
 using namespace cv;
 using namespace cv::xfeatures2d;
@@ -42,7 +42,7 @@ void MainWindow::on_fImgOpen_btn_clicked()//打开第一个图片
     {
         if(image1.load(OpenFile))
         {
-            Mat matImage=ImageProcess::QImage2cvMat(image1);
+            Mat matImage=Utils::QImage2cvMat(image1);
             imshow("image1",matImage);
             //show file path
             QFileInfo OpenFileInfo;
@@ -63,7 +63,7 @@ void MainWindow::on_fImgOpen2_btn_clicked()
     {
         if(image2.load(OpenFile))
         {
-            Mat matImage=ImageProcess::QImage2cvMat(image2);
+            Mat matImage=Utils::QImage2cvMat(image2);
             imshow("image2",matImage);
             //show file path
             QFileInfo OpenFileInfo;
@@ -156,15 +156,16 @@ void MainWindow::on_point2point_btn_clicked()
 void MainWindow::on_videoProcess_btn_clicked()
 {
     setMsg("video function is running...");
-    VideoProcess::videoCheckSynchronized();
+    VideoProcess::videoCheckSynchronized(videoMacthTargetPath, videoPath);
+
     setMsg("video function is finished!");
 }
 
 void MainWindow::on_videoDetectFunc_cmb_currentIndexChanged(int index)
 {
-    qDebug()<<"original video proc index is:"<<videoProcIndex;
+    qDebug()<<"original video detect function index is:"<<videoProcIndex;
     videoProcIndex=index;
-    qDebug()<<"new video proc index is: "<<videoProcIndex;
+    qDebug()<<"new video detect function index is: "<<videoProcIndex;
 }
 
 void MainWindow::on_featureMatch_cmb_currentIndexChanged(int index)
@@ -180,36 +181,66 @@ void MainWindow::on_videoPath_returnPressed()
     qDebug()<<"video path is:"<<videoPath;
 }
 
+void MainWindow::on_videoTargetImg_btn_clicked()
+{
+    QString openFile,openFilePath;
+    openFile = QFileDialog::getOpenFileName(this,  "Please choose an image file", "",
+                                                 "Image Files(*.jpg *.png *.bmp *.pgm *.pbm);;All(*.*)");
+    if(openFile!="")
+    {
+        //show file path
+        QFileInfo openFileInfo;
+        openFileInfo=QFileInfo(openFile);
+        openFilePath=openFileInfo.filePath();
+        ui->videoTargetImgPath->setText(openFilePath);
+        Mat img = imread(Utils::qstr2str(openFilePath));
+        videoMacthTargetPath = openFilePath;
+        imshow("target image", img);
+        setMsg("video file has opened.");
+
+
+
+    }
+}
+
 void MainWindow::on_videoOpen_btn_clicked()
 {
-    QString OpenFile,OpenFilePath;
-    OpenFile = QFileDialog::getOpenFileName(this,  "Please choose an video file", "",
+    QString openFile,openFilePath;
+    openFile = QFileDialog::getOpenFileName(this,  "Please choose an video file", "",
                                                  "Video Files(*.mp4 *.flv *.avi);;All(*.*)");
-    if(OpenFile!="")
+    if(openFile!="")
     {
         // TODO::处理视频文件
 
         //show file path
         QFileInfo OpenFileInfo;
-        OpenFileInfo=QFileInfo(OpenFile);
-        OpenFilePath=OpenFileInfo.filePath();
-        ui->videoPath->setText(OpenFilePath);
-
+        OpenFileInfo=QFileInfo(openFile);
+        openFilePath=OpenFileInfo.filePath();
+        ui->videoPath->setText(openFilePath);
         setMsg("video file has opened.");
+        videoPath = openFilePath;
+
+        VideoCapture capture(Utils::qstr2str(openFilePath));
+        String winName = "读取视频";
+        namedWindow(winName, WINDOW_NORMAL);
+        while(1)
+        {
+            Mat frame;  // 存储每一帧图像
+            capture >> frame;
+            imshow(winName, frame);
+            waitKey(30);    // 延迟30ms
+            // 判断是否点击窗口关闭按键		窗口关闭返回 -1
+            if(getWindowProperty(winName,0) == -1)
+            {
+                qDebug()<<"video window closed.";
+                break;
+            }
+        }
+        capture.release();
     }
 
 }
 
-QString str2qstr(const string str)
-{
-    return QString::fromLocal8Bit(str.data());
-}
-
-string qstr2str(const QString qstr)
-{
-    QByteArray cdata = qstr.toLocal8Bit();
-    return string(cdata);
-}
 
 void MainWindow::on_testFeatureSelection_btn_clicked()
 {
@@ -218,7 +249,7 @@ void MainWindow::on_testFeatureSelection_btn_clicked()
         this->setMsg("Image 1 is null!");
         return;
     }
-    String path = qstr2str(ui->ImagePath1->text());
+    String path = Utils::qstr2str(ui->ImagePath1->text());
     Mat src = imread(path,IMREAD_GRAYSCALE);
     //namedWindow("test feature", WINDOW_NORMAL);
     imshow("Origin Image", src);
@@ -256,3 +287,5 @@ void MainWindow::on_testFeatureMatch_btn_clicked()
 {
 
 }
+
+

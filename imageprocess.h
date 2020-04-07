@@ -2,7 +2,6 @@
 #define IMAGEPROCESS_H
 #include <QImage>
 #include <opencv2/opencv.hpp>
-#include <opencv2/imgproc/types_c.h>
 using namespace cv;
 
 class ImageProcess
@@ -21,8 +20,6 @@ public:
     static void bruteForce();
     static void FLANN();
     static void RANSAC();
-    static Mat QImage2cvMat(QImage image);      //将QImage类型图片转换为cv可以处理的矩阵类型
-    static QImage cvMat2QImage(const Mat& mat); //将MAT类型图片转换为QImage
 };
 
 #endif // IMAGEPROCESS_H

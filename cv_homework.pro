@@ -26,6 +26,7 @@ HEADERS += \
     imageprocess.h \
     mainwindow.h \
     methodvalidate.h \
+    utils.h \
     videoprocess.h
 
 FORMS += \
@@ -94,6 +95,7 @@ D:\new_opencv4.2.0\opencv\x64\vc15\lib\opencv_surface_matching420.lib \
 D:\new_opencv4.2.0\opencv\x64\vc15\lib\opencv_text420.lib \
 D:\new_opencv4.2.0\opencv\x64\vc15\lib\opencv_tracking420.lib \
 D:\new_opencv4.2.0\opencv\x64\vc15\lib\opencv_video420.lib \
+D:\new_opencv4.2.0\opencv\x64\vc15\lib\opencv_videoio420.lib \
 D:\new_opencv4.2.0\opencv\x64\vc15\lib\opencv_videostab420.lib \
 D:\new_opencv4.2.0\opencv\x64\vc15\lib\opencv_xfeatures2d420.lib \
 D:\new_opencv4.2.0\opencv\x64\vc15\lib\opencv_ximgproc420.lib \
