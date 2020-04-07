@@ -13,8 +13,10 @@ public:
     VideoProcess();
     static void videoCheckSynchronized(QString imagePath, QString videoPath);//返回值类型未知，参数类型个数未知..
 
+private:
     // opencv中有可以调用的函数时，用opencv的进行替换
-    static void RANSAC(QImage image);
+    static void mRANSAC(vector<KeyPoint> &target, vector<KeyPoint> &scene, vector<DMatch> &matches);
+    static void goodMatch(vector<DMatch> &matches);
 };
 
 #endif // VIDEOPROCESS_H
