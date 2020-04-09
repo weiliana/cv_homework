@@ -114,10 +114,12 @@ void MainWindow::on_FERNS_btn_clicked()
     switch(featureSelectionIndex)
     {
     case 0:
-        ImageProcess::sift();
+        //ImageProcess::sift();
         break;
     case 1:
-        ImageProcess::surf();
+        //ImageProcess::surf();
+        break;
+    default:
         break;
     }
 
@@ -149,7 +151,7 @@ void MainWindow::on_targetDetect_btn_clicked()
 void MainWindow::on_point2point_btn_clicked()
 {
     setMsg("point2point is running...");
-    ImageProcess::point2point();
+    ImageProcess::point2point(featureSelectionIndex,featureMatchIndex,is_RANSAC_checked,image1,image2,Hessian);
     setMsg("point2point is finished!");
 }
 
@@ -157,7 +159,6 @@ void MainWindow::on_videoProcess_btn_clicked()
 {
     setMsg("video function is running...");
     VideoProcess::videoCheckSynchronized(videoMacthTargetPath, videoPath);
-
     setMsg("video function is finished!");
 }
 
