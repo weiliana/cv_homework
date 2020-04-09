@@ -9,27 +9,12 @@ ImageProcess::ImageProcess()
 
 void ImageProcess::point2point(int featureSelectionIndex,int featureMatchIndex,bool RANSAC_on,QImage qimg1,QImage qimg2,int Hessian)
 {
-    vector<KeyPoint> keyPoints1,keyPoints2;
-    Mat cvImg1,cvImg2,imageDesc1,imageDesc2,resultImg;
-    vector<DMatch> matches;
+    Mat cvImg1,cvImg2,resultImg;
     cvImg1=Utils::QImage2cvMat(qimg1);
     cvImg2=Utils::QImage2cvMat(qimg2);
-    if(featureSelectionIndex==0)
-    {
-        sift(cvImg1,cvImg2,Hessian,keyPoints1,keyPoints2,imageDesc1,imageDesc2);
-    }
-    else
-    {
-        surf(cvImg1,cvImg2,Hessian,keyPoints1,keyPoints2,imageDesc1,imageDesc2);
-    }
-    if(featureMatchIndex==0)
-    {
-        bruteForce(imageDesc1,imageDesc2,matches);
-    }
-    else
-    {
-        FLANN(imageDesc1,imageDesc2,matches);
-    }
+    vector<KeyPoint> keyPoints1,keyPoints2;
+    vector<DMatch> matches;
+    commonProcess(featureSelectionIndex,featureMatchIndex,RANSAC_on,cvImg1,cvImg2,resultImg,Hessian,keyPoints1,keyPoints2,matches);
     if(!RANSAC_on)
     {
         drawMatches(cvImg1,keyPoints1,cvImg2,keyPoints2,matches,resultImg);
@@ -38,15 +23,35 @@ void ImageProcess::point2point(int featureSelectionIndex,int featureMatchIndex,b
     {
         vector<KeyPoint> rand_keyPoints1,rand_keyPoints2;
         vector<DMatch> rand_matches;
-        RANSAC(keyPoints1,keyPoints2,matches,rand_keyPoints1,rand_keyPoints2,rand_matches);
+        vector<Point2f> points_1,points_2;
+        RANSAC(keyPoints1,keyPoints2,matches,rand_keyPoints1,rand_keyPoints2,rand_matches,points_1,points_2);
         drawMatches(cvImg1,rand_keyPoints1,cvImg2,rand_keyPoints2,rand_matches,resultImg);
     }
     imshow("Point to point",resultImg);
 }
 
-void ImageProcess::geometricCorrection()
+void ImageProcess::geometricCorrection(int featureSelectionIndex,int featureMatchIndex,bool RANSAC_on,QImage qimg1,QImage qimg2,int Hessian)
 {
-
+    Mat cvImg1,cvImg2,resultImg;
+    cvImg1=Utils::QImage2cvMat(qimg1);
+    cvImg2=Utils::QImage2cvMat(qimg2);
+    vector<KeyPoint> keyPoints1,keyPoints2;
+    vector<DMatch> matches;
+    commonProcess(featureSelectionIndex,featureMatchIndex,RANSAC_on,cvImg1,cvImg2,resultImg,Hessian,keyPoints1,keyPoints2,matches);
+    if(!RANSAC_on)
+    {
+        //drawMatches(cvImg1,keyPoints1,cvImg2,keyPoints2,matches,resultImg);
+    }
+    else
+    {
+        vector<KeyPoint> rand_keyPoints1,rand_keyPoints2;
+        vector<DMatch> rand_matches;
+        vector<Point2f> points_1,points_2;
+        RANSAC(keyPoints1,keyPoints2,matches,rand_keyPoints1,rand_keyPoints2,rand_matches,points_1,points_2);
+        Mat Homo = findHomography(points_2, points_1, FM_RANSAC);
+        warpPerspective(cvImg2, resultImg, Homo, Size(cvImg1.size().width, cvImg1.size().height));
+    }
+    imshow("Geometric Correction",resultImg);
 }
 
 void ImageProcess::imageMosaic()
@@ -54,12 +59,49 @@ void ImageProcess::imageMosaic()
 
 }
 
-void ImageProcess::targetDetect()
+void ImageProcess::targetDetect(int featureSelectionIndex,int featureMatchIndex,bool RANSAC_on,QImage qimg1,QImage qimg2,int Hessian)
 {
+    Mat cvImg1,cvImg2,resultImg;
+    cvImg1=Utils::QImage2cvMat(qimg1);
+    cvImg2=Utils::QImage2cvMat(qimg2);
+    if (cvImg1.cols > cvImg2.cols&&cvImg1.rows > cvImg2.rows)
+    {
+        Mat temp=cvImg1;
+        cvImg1=cvImg2;
+        cvImg2=temp;
+    }
+    vector<KeyPoint> keyPoints1,keyPoints2;
+    vector<DMatch> matches;
+    commonProcess(featureSelectionIndex,featureMatchIndex,RANSAC_on,cvImg1,cvImg2,resultImg,Hessian,keyPoints1,keyPoints2,matches);
+    if(!RANSAC_on)
+    {
+        //drawMatches(cvImg1,keyPoints1,cvImg2,keyPoints2,matches,resultImg);
+    }
+    else
+    {
+        vector<KeyPoint> rand_keyPoints1,rand_keyPoints2;
+        vector<DMatch> rand_matches;
+        vector<Point2f> points_1,points_2;
+        RANSAC(keyPoints1,keyPoints2,matches,rand_keyPoints1,rand_keyPoints2,rand_matches,points_1,points_2);
+        Mat Homo = findHomography(points_1, points_2, FM_RANSAC);
+        vector<Point2f> objCorners(4);
+        objCorners[0] = cvPoint(0, 0);
+        objCorners[1] = cvPoint(cvImg1.cols, 0);
+        objCorners[2] = cvPoint(cvImg1.cols, cvImg1.rows);
+        objCorners[3] = cvPoint(0, cvImg1.rows);
+        vector<Point2f> sceneCorners(4);
+        perspectiveTransform(objCorners, sceneCorners, Homo);
+        //Mat target_detect_Result;
+        //drawMatches(image1, new_rand_keypoint1, image2, new_rand_keypoint2, new_matches, target_detect_Result);
+        drawMatches(cvImg1, rand_keyPoints1, cvImg2, rand_keyPoints2, rand_matches, resultImg);
 
+        line(resultImg, sceneCorners[0] + Point2f(cvImg1.cols, 0), sceneCorners[1] + Point2f(cvImg1.cols, 0), Scalar(0, 255, 0), 4);
+        line(resultImg, sceneCorners[1] + Point2f(cvImg1.cols, 0), sceneCorners[2] + Point2f(cvImg1.cols, 0), Scalar(0, 255, 0), 4);
+        line(resultImg, sceneCorners[2] + Point2f(cvImg1.cols, 0), sceneCorners[3] + Point2f(cvImg1.cols, 0), Scalar(0, 255, 0), 4);
+        line(resultImg, sceneCorners[3] + Point2f(cvImg1.cols, 0), sceneCorners[0] + Point2f(cvImg1.cols, 0), Scalar(0, 255, 0), 4);
+    }
+    imshow("Target Detection", resultImg);
 }
-
-
 
 void ImageProcess::sift(Mat cvImg1,Mat cvImg2,int Hessian,vector<KeyPoint> &keyPoints1,vector<KeyPoint> &keyPoints2,Mat &imageDesc1,Mat &imageDesc2)
 {
@@ -107,7 +149,7 @@ void ImageProcess::FLANN(Mat imageDesc1,Mat imageDesc2,vector<DMatch> &matches)
     FLANNmatcher.match(imageDesc1, imageDesc2, matches, Mat());
 }
 
-void ImageProcess::RANSAC(vector<KeyPoint>keyPoints1,vector<KeyPoint>keyPoints2,vector<DMatch> matches,vector<KeyPoint> &new_rand_keypoint1,vector<KeyPoint> &new_rand_keypoint2,vector <DMatch> &new_matches)
+void ImageProcess::RANSAC(vector<KeyPoint>keyPoints1,vector<KeyPoint>keyPoints2,vector<DMatch> matches,vector<KeyPoint> &new_rand_keypoint1,vector<KeyPoint> &new_rand_keypoint2,vector <DMatch> &new_matches,vector<Point2f> &points_1,vector<Point2f> &points_2)
 {
     double min_dist = matches[0].distance, max_dist = matches[0].distance;
     for (size_t m = 0; m < matches.size(); m++)
@@ -145,7 +187,7 @@ void ImageProcess::RANSAC(vector<KeyPoint>keyPoints1,vector<KeyPoint>keyPoints2,
         rand_keypoint2.push_back(keyPoints2[goodMatches[i].trainIdx]);
     }
     //坐标变换
-    vector <Point2f> points_1, points_2;
+    //vector <Point2f> points_1, points_2;
     for (size_t i = 0; i < old_matches.size(); i++)
     {
         points_1.push_back(rand_keypoint1[i].pt);
@@ -171,6 +213,29 @@ void ImageProcess::RANSAC(vector<KeyPoint>keyPoints1,vector<KeyPoint>keyPoints2,
     }
     //Mat Ransac_Result;
     //drawMatches(image1, new_rand_keypoint1, image2, new_rand_keypoint2, new_matches, Ransac_Result);
+}
+
+void ImageProcess::commonProcess(int featureSelectionIndex,int featureMatchIndex,bool RANSAC_on,Mat cvImg1,Mat cvImg2,Mat &resultImg,int Hessian, vector<KeyPoint> &keyPoints1, vector<KeyPoint> &keyPoints2,vector<DMatch> &matches)
+{
+    //vector<KeyPoint> keyPoints1,keyPoints2;
+    Mat imageDesc1,imageDesc2;
+    //vector<DMatch> matches;
+    if(featureSelectionIndex==0)
+    {
+        sift(cvImg1,cvImg2,Hessian,keyPoints1,keyPoints2,imageDesc1,imageDesc2);
+    }
+    else
+    {
+        surf(cvImg1,cvImg2,Hessian,keyPoints1,keyPoints2,imageDesc1,imageDesc2);
+    }
+    if(featureMatchIndex==0)
+    {
+        bruteForce(imageDesc1,imageDesc2,matches);
+    }
+    else
+    {
+        FLANN(imageDesc1,imageDesc2,matches);
+    }
 }
 
 Mat ImageProcess::preprocessImg(Mat srcImg)

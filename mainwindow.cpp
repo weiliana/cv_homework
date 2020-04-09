@@ -137,14 +137,14 @@ void MainWindow::on_imageMosaic_btn_clicked()
 void MainWindow::on_geometricCorrection_btn_clicked()
 {
     setMsg("geometricCorrection is running...");
-    ImageProcess::geometricCorrection();
+    ImageProcess::geometricCorrection(featureSelectionIndex,featureMatchIndex,is_RANSAC_checked,image1,image2,Hessian);
     setMsg("geometricCorrection is finished!");
 }
 
 void MainWindow::on_targetDetect_btn_clicked()
 {
     setMsg("target detect is running...");
-    ImageProcess::targetDetect();
+    ImageProcess::targetDetect(featureSelectionIndex,featureMatchIndex,is_RANSAC_checked,image1,image2,Hessian);
     setMsg("target detect is finished!");
 }
 
