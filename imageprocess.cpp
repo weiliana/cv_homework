@@ -40,7 +40,41 @@ void ImageProcess::geometricCorrection(int featureSelectionIndex,int featureMatc
     commonProcess(featureSelectionIndex,featureMatchIndex,RANSAC_on,cvImg1,cvImg2,resultImg,Hessian,keyPoints1,keyPoints2,matches);
     if(!RANSAC_on)
     {
-        //drawMatches(cvImg1,keyPoints1,cvImg2,keyPoints2,matches,resultImg);
+        double min_dist = matches[0].distance, max_dist = matches[0].distance;
+        for (size_t m = 0; m < matches.size(); m++)
+        {
+           if (matches[m].distance < min_dist)
+           {
+               min_dist = matches[m].distance;
+           }
+           if (matches[m].distance > max_dist)
+           {
+                max_dist = matches[m].distance;
+           }
+         }
+         //筛选出较好的匹配点
+         vector<DMatch> goodMatches;
+         for (size_t m = 0; m < matches.size(); m++)
+         {
+            if (matches[m].distance < 2 * min_dist)
+            {
+                goodMatches.push_back(matches[m]);
+            }
+          }
+         vector <KeyPoint> good_keyPoints1, good_keyPoints2;
+         for (size_t i = 0; i < goodMatches.size(); i++)
+         {
+             good_keyPoints1.push_back(keyPoints1[goodMatches[i].queryIdx]);
+             good_keyPoints2.push_back(keyPoints2[goodMatches[i].trainIdx]);
+          }
+          vector<Point2f> points_1,points_2;
+          for (size_t i = 0; i < goodMatches.size(); i++)
+          {
+              points_1.push_back(good_keyPoints1[i].pt);
+              points_2.push_back(good_keyPoints2[i].pt);
+          }
+          Mat Homo = findHomography(points_1, points_2, 0);
+          warpPerspective(cvImg2, resultImg, Homo, Size(cvImg1.size().width, cvImg1.size().height));
     }
     else
     {
@@ -75,7 +109,53 @@ void ImageProcess::targetDetect(int featureSelectionIndex,int featureMatchIndex,
     commonProcess(featureSelectionIndex,featureMatchIndex,RANSAC_on,cvImg1,cvImg2,resultImg,Hessian,keyPoints1,keyPoints2,matches);
     if(!RANSAC_on)
     {
-        //drawMatches(cvImg1,keyPoints1,cvImg2,keyPoints2,matches,resultImg);
+      double min_dist = matches[0].distance, max_dist = matches[0].distance;
+      for (size_t m = 0; m < matches.size(); m++)
+      {
+         if (matches[m].distance < min_dist)
+         {
+             min_dist = matches[m].distance;
+         }
+         if (matches[m].distance > max_dist)
+         {
+              max_dist = matches[m].distance;
+         }
+       }
+       //筛选出较好的匹配点
+       vector<DMatch> goodMatches;
+       for (size_t m = 0; m < matches.size(); m++)
+       {
+          if (matches[m].distance < 2 * min_dist)
+          {
+              goodMatches.push_back(matches[m]);
+          }
+        }
+       vector <KeyPoint> good_keyPoints1, good_keyPoints2;
+       for (size_t i = 0; i < goodMatches.size(); i++)
+       {
+           good_keyPoints1.push_back(keyPoints1[goodMatches[i].queryIdx]);
+           good_keyPoints2.push_back(keyPoints2[goodMatches[i].trainIdx]);
+        }
+        vector<Point2f> points_1,points_2;
+        for (size_t i = 0; i < goodMatches.size(); i++)
+        {
+            points_1.push_back(good_keyPoints1[i].pt);
+            points_2.push_back(good_keyPoints2[i].pt);
+        }
+        Mat Homo = findHomography(points_1, points_2, 0);
+        vector<Point2f> objCorners(4);
+        objCorners[0] = cvPoint(0, 0);
+        objCorners[1] = cvPoint(cvImg1.cols, 0);
+        objCorners[2] = cvPoint(cvImg1.cols, cvImg1.rows);
+        objCorners[3] = cvPoint(0, cvImg1.rows);
+        vector<Point2f> sceneCorners(4);
+        perspectiveTransform(objCorners, sceneCorners, Homo);
+        drawMatches(cvImg1, keyPoints1, cvImg2, keyPoints2, goodMatches, resultImg);
+
+        line(resultImg, sceneCorners[0] + Point2f(cvImg1.cols, 0), sceneCorners[1] + Point2f(cvImg1.cols, 0), Scalar(0, 255, 0), 4);
+        line(resultImg, sceneCorners[1] + Point2f(cvImg1.cols, 0), sceneCorners[2] + Point2f(cvImg1.cols, 0), Scalar(0, 255, 0), 4);
+        line(resultImg, sceneCorners[2] + Point2f(cvImg1.cols, 0), sceneCorners[3] + Point2f(cvImg1.cols, 0), Scalar(0, 255, 0), 4);
+        line(resultImg, sceneCorners[3] + Point2f(cvImg1.cols, 0), sceneCorners[0] + Point2f(cvImg1.cols, 0), Scalar(0, 255, 0), 4);
     }
     else
     {
@@ -91,8 +171,6 @@ void ImageProcess::targetDetect(int featureSelectionIndex,int featureMatchIndex,
         objCorners[3] = cvPoint(0, cvImg1.rows);
         vector<Point2f> sceneCorners(4);
         perspectiveTransform(objCorners, sceneCorners, Homo);
-        //Mat target_detect_Result;
-        //drawMatches(image1, new_rand_keypoint1, image2, new_rand_keypoint2, new_matches, target_detect_Result);
         drawMatches(cvImg1, rand_keyPoints1, cvImg2, rand_keyPoints2, rand_matches, resultImg);
 
         line(resultImg, sceneCorners[0] + Point2f(cvImg1.cols, 0), sceneCorners[1] + Point2f(cvImg1.cols, 0), Scalar(0, 255, 0), 4);
@@ -109,12 +187,10 @@ void ImageProcess::sift(Mat cvImg1,Mat cvImg2,int Hessian,vector<KeyPoint> &keyP
     Mat cvImg2_gray=preprocessImg(cvImg2);
 
     Ptr<xfeatures2d::SIFT> siftDetector = xfeatures2d::SIFT::create(Hessian);
-    //std::vector<KeyPoint> keyPoints1,keyPoints2;
     siftDetector->detect(cvImg1_gray,keyPoints1);
     siftDetector->detect(cvImg2_gray,keyPoints2);
 
     Ptr<xfeatures2d::SIFT> siftDescriptor = xfeatures2d::SIFT::create();
-    //Mat imageDesc1, imageDesc2;
     siftDescriptor->compute(cvImg1_gray, keyPoints1, imageDesc1);
     siftDescriptor->compute(cvImg2_gray, keyPoints2, imageDesc2);
 }
@@ -125,12 +201,10 @@ void ImageProcess::surf(Mat cvImg1,Mat cvImg2,int Hessian,vector<KeyPoint> &keyP
     Mat cvImg2_gray=preprocessImg(cvImg2);
 
     Ptr<xfeatures2d::SURF> surfDetector = xfeatures2d::SURF::create(Hessian);
-    //std::vector<KeyPoint> keyPoints1,keyPoints2;
     surfDetector->detect(cvImg1_gray,keyPoints1);
     surfDetector->detect(cvImg2_gray,keyPoints2);
 
     Ptr<xfeatures2d::SURF> surfDescriptor = xfeatures2d::SURF::create();
-    //Mat imageDesc1, imageDesc2;
     surfDescriptor->compute(cvImg1_gray, keyPoints1, imageDesc1);
     surfDescriptor->compute(cvImg2_gray, keyPoints2, imageDesc2);
 }
@@ -138,14 +212,12 @@ void ImageProcess::surf(Mat cvImg1,Mat cvImg2,int Hessian,vector<KeyPoint> &keyP
 void ImageProcess::bruteForce(Mat imageDesc1,Mat imageDesc2,vector<DMatch> &matches)
 {
     BFMatcher bfmatcher;
-    //std::vector<DMatch> matches;  //存储里面的一些点的信息
     bfmatcher.match(imageDesc1, imageDesc2, matches, Mat());
 }
 
 void ImageProcess::FLANN(Mat imageDesc1,Mat imageDesc2,vector<DMatch> &matches)
 {
     FlannBasedMatcher FLANNmatcher;
-    //std::vector<DMatch> matches;
     FLANNmatcher.match(imageDesc1, imageDesc2, matches, Mat());
 }
 
@@ -195,9 +267,7 @@ void ImageProcess::RANSAC(vector<KeyPoint>keyPoints1,vector<KeyPoint>keyPoints2,
     }
     vector<uchar> RansacStatus;
     Mat Fundamental = findFundamentalMat(points_1, points_2, RansacStatus, FM_RANSAC);
-    //重新定义关键点new_rand_keypoint和new_matches来存储新的关键点和基础矩阵，通过RansacStatus来删除误匹配点
-    //vector <KeyPoint> new_rand_keypoint1, new_rand_keypoint2;
-    //vector <DMatch> new_matches;
+    //新的关键点new_rand_keypoint和new_matches来存储新的关键点和基础矩阵，通过RansacStatus来删除误匹配点
     int index = 0;
     for (size_t i = 0; i < old_matches.size(); i++)
     {
@@ -211,15 +281,11 @@ void ImageProcess::RANSAC(vector<KeyPoint>keyPoints1,vector<KeyPoint>keyPoints2,
             index++;
         }
     }
-    //Mat Ransac_Result;
-    //drawMatches(image1, new_rand_keypoint1, image2, new_rand_keypoint2, new_matches, Ransac_Result);
 }
 
 void ImageProcess::commonProcess(int featureSelectionIndex,int featureMatchIndex,bool RANSAC_on,Mat cvImg1,Mat cvImg2,Mat &resultImg,int Hessian, vector<KeyPoint> &keyPoints1, vector<KeyPoint> &keyPoints2,vector<DMatch> &matches)
 {
-    //vector<KeyPoint> keyPoints1,keyPoints2;
     Mat imageDesc1,imageDesc2;
-    //vector<DMatch> matches;
     if(featureSelectionIndex==0)
     {
         sift(cvImg1,cvImg2,Hessian,keyPoints1,keyPoints2,imageDesc1,imageDesc2);
