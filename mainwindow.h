@@ -57,5 +57,7 @@ private slots:
     void on_testRANSAC_btn_clicked();
     void on_testFeatureMatch_btn_clicked();
     void on_videoTargetImg_btn_clicked();
+    void on_useCamera_btn_clicked();
+    void on_videoContinue_btn_clicked();
 };
 #endif // MAINWINDOW_H

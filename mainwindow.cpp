@@ -158,7 +158,23 @@ void MainWindow::on_point2point_btn_clicked()
 void MainWindow::on_videoProcess_btn_clicked()
 {
     setMsg("video function is running...");
+    VideoProcess::setVideoStatus(true);
     VideoProcess::videoCheckSynchronized(videoMacthTargetPath, videoPath);
+    setMsg("video function is finished!");
+}
+
+
+void MainWindow::on_videoContinue_btn_clicked()
+{
+    bool isVideoOn = VideoProcess::getVideoStatus();
+    VideoProcess::setVideoStatus(!isVideoOn);
+}
+
+void MainWindow::on_useCamera_btn_clicked()
+{
+    setMsg("video function is running...");
+    VideoProcess::setVideoStatus(true);
+    VideoProcess::videoCheckSynchronized(videoMacthTargetPath, videoPath, true);
     setMsg("video function is finished!");
 }
 
@@ -198,8 +214,6 @@ void MainWindow::on_videoTargetImg_btn_clicked()
         videoMacthTargetPath = openFilePath;
         imshow("target image", img);
         setMsg("video file has opened.");
-
-
 
     }
 }
@@ -288,5 +302,4 @@ void MainWindow::on_testFeatureMatch_btn_clicked()
 {
 
 }
-
 

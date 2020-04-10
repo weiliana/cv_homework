@@ -9,19 +9,34 @@ using namespace cv::xfeatures2d;
 using namespace std;
 
 #define RATIO 0.4
+static bool IsVideoOn = false;
 
 VideoProcess::VideoProcess()
 {
 
 }
 
-void VideoProcess::videoCheckSynchronized(QString imagePath, QString videoPath)
+bool VideoProcess::getVideoStatus()
+{
+    return IsVideoOn;
+}
+
+void VideoProcess::setVideoStatus(bool isOn)
+{
+    IsVideoOn = isOn;
+}
+
+void VideoProcess::videoCheckSynchronized(QString imagePath, QString videoPath, bool useCamera)
 {
     // 测试ORB
     Mat target;
     target = imread(Utils::qstr2str(imagePath));
     //Mat frame = imread("E:/picture/ORBtest_scene.png");
-    VideoCapture capture(Utils::qstr2str(videoPath));
+    VideoCapture capture;
+    if(useCamera)
+        capture = VideoCapture(0);  // 打开默认的摄像
+    else
+        capture = VideoCapture(Utils::qstr2str(videoPath));
     String winName = "ORB output";
     namedWindow(winName, WINDOW_AUTOSIZE);
     // 帧率
@@ -34,7 +49,11 @@ void VideoProcess::videoCheckSynchronized(QString imagePath, QString videoPath)
     // 特征检测
     while(1)
     {
+        //qDebug()<<"running...";
+        qDebug()<<"video is on: "<<IsVideoOn;
         t = (double)getTickCount();
+        if(IsVideoOn)
+        {
         //capture>>target;
         Mat frame;  // 存储每一帧图像
         capture >> frame;
@@ -61,7 +80,7 @@ void VideoProcess::videoCheckSynchronized(QString imagePath, QString videoPath)
         goodMatch(matches);
         // RANSAC
         //mRANSAC(keypoints_target,keypoints_scene,matches);
-        //qDebug()<<"good match points: " << matches.size();
+        qDebug()<<"good match points: " << matches.size();
         Mat dst;
         drawMatches(target, keypoints_target, frame, keypoints_scene, matches, dst);
 
@@ -71,16 +90,19 @@ void VideoProcess::videoCheckSynchronized(QString imagePath, QString videoPath)
         fpsStr = String("FPS:") + string;
         putText(dst, fpsStr, Point(5,20), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,255,255));
         imshow(winName, dst);
-
         waitKey(1);  // 延迟
+        }
+        else waitKey(10);
         t++;
         if(getWindowProperty(winName,0) == -1)
         {
+            IsVideoOn = false;
+            capture.release();
             qDebug()<<"video window closed.";
             break;
         }
     }
-    capture.release();
+
 }
 
 void VideoProcess::mRANSAC(vector<KeyPoint> &target, vector<KeyPoint> &scene, vector<DMatch> &matches)

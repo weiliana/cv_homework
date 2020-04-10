@@ -7,11 +7,14 @@
 #include "utils.h"
 using namespace cv;
 
+
 class VideoProcess
 {
 public:
     VideoProcess();
-    static void videoCheckSynchronized(QString imagePath, QString videoPath);//返回值类型未知，参数类型个数未知..
+    static bool getVideoStatus();
+    static void setVideoStatus(bool isOn);
+    static void videoCheckSynchronized(QString imagePath, QString videoPath, bool useCamera = false);//返回值类型未知，参数类型个数未知..
 
 private:
     // opencv中有可以调用的函数时，用opencv的进行替换

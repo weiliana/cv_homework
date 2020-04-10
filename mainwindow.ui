@@ -450,6 +450,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="useCamera_btn">
+            <property name="text">
+             <string>使用摄像头</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="horizontalSpacer_6">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -463,9 +470,23 @@
            </spacer>
           </item>
           <item>
+           <widget class="QPushButton" name="videoContinue_btn">
+            <property name="text">
+             <string>继续/暂停</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="videoStepProcess_btn">
+            <property name="text">
+             <string>逐帧处理</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="videoProcess_btn">
             <property name="text">
-             <string>处理</string>
+             <string>正常处理</string>
             </property>
            </widget>
           </item>
