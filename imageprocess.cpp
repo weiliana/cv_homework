@@ -91,75 +91,75 @@ void ImageProcess::geometricCorrection(int featureSelectionIndex,int featureMatc
 void ImageProcess::imageMosaic(int featureSelectionIndex,int featureMatchIndex,bool RANSAC_on,QImage qimg1,QImage qimg2,int Hessian)
 {
     Mat cvImg1,cvImg2,resultImg;
-       cvImg1=Utils::QImage2cvMat(qimg1);
-       cvImg2=Utils::QImage2cvMat(qimg2);
-       vector<KeyPoint> keyPoints1,keyPoints2;
-       vector<DMatch> matches;
-       commonProcess(featureSelectionIndex,featureMatchIndex,cvImg1,cvImg2,resultImg,Hessian,keyPoints1,keyPoints2,matches);
-       if(!RANSAC_on)
-       {
-           double min_dist = matches[0].distance, max_dist = matches[0].distance;
-           for (size_t m = 0; m < matches.size(); m++)
+    cvImg1=Utils::QImage2cvMat(qimg1);
+    cvImg2=Utils::QImage2cvMat(qimg2);
+    vector<KeyPoint> keyPoints1,keyPoints2;
+    vector<DMatch> matches;
+    commonProcess(featureSelectionIndex,featureMatchIndex,cvImg1,cvImg2,resultImg,Hessian,keyPoints1,keyPoints2,matches);
+    if(!RANSAC_on)
+    {
+        double min_dist = matches[0].distance, max_dist = matches[0].distance;
+        for (size_t m = 0; m < matches.size(); m++)
+        {
+           if (matches[m].distance < min_dist)
            {
-              if (matches[m].distance < min_dist)
-              {
-                  min_dist = matches[m].distance;
-              }
-              if (matches[m].distance > max_dist)
-              {
-                   max_dist = matches[m].distance;
-              }
+               min_dist = matches[m].distance;
+           }
+           if (matches[m].distance > max_dist)
+           {
+                max_dist = matches[m].distance;
+           }
+         }
+         //筛选出较好的匹配点
+         vector<DMatch> goodMatches;
+         for (size_t m = 0; m < matches.size(); m++)
+         {
+            if (matches[m].distance < 2 * min_dist)
+            {
+                goodMatches.push_back(matches[m]);
             }
-            //筛选出较好的匹配点
-            vector<DMatch> goodMatches;
-            for (size_t m = 0; m < matches.size(); m++)
-            {
-               if (matches[m].distance < 2 * min_dist)
-               {
-                   goodMatches.push_back(matches[m]);
-               }
-             }
-            vector <KeyPoint> good_keyPoints1, good_keyPoints2;
-            for (size_t i = 0; i < goodMatches.size(); i++)
-            {
-                good_keyPoints1.push_back(keyPoints1[goodMatches[i].queryIdx]);
-                good_keyPoints2.push_back(keyPoints2[goodMatches[i].trainIdx]);
-             }
-             vector<Point2f> points_1,points_2;
-             for (size_t i = 0; i < goodMatches.size(); i++)
-             {
-                 points_1.push_back(good_keyPoints1[i].pt);
-                 points_2.push_back(good_keyPoints2[i].pt);
-             }
-             Mat Homo = findHomography(points_1, points_2, 0);
-             Mat MosaicMat=(Mat_<double>(3, 3) << 1.0, 0, cvImg1.cols, 0, 1.0, 0, 0, 0, 1.0);
-             Mat MosaicHomo=MosaicMat*Homo;
-             Point2f originalLinkPoint,targetLinkPoint,basedImgPoint;
-             originalLinkPoint = keyPoints1[goodMatches[0].queryIdx].pt;
-             targetLinkPoint = getTransformPoint(originalLinkPoint, MosaicHomo);
-             basedImgPoint = keyPoints2[goodMatches[0].trainIdx].pt;
-             warpPerspective(cvImg1, resultImg, MosaicHomo, Size(cvImg2.cols + cvImg1.cols + 10, cvImg2.rows));
-             Mat ROIMat = cvImg2(Rect(Point(basedImgPoint.x, 0), Point(cvImg2.cols, cvImg2.rows)));
-             ROIMat.copyTo(Mat(resultImg, Rect(targetLinkPoint.x, 0, cvImg2.cols - basedImgPoint.x + 1, cvImg2.rows)));
-       }
-       else
-       {
-           vector<KeyPoint> rand_keyPoints1,rand_keyPoints2;
-           vector<DMatch> goodMatches,rand_matches;
-           vector<Point2f> points_1,points_2;
-           RANSAC(keyPoints1,keyPoints2,matches,goodMatches,rand_keyPoints1,rand_keyPoints2,rand_matches,points_1,points_2);
-           Mat Homo = findHomography(points_2, points_1, FM_RANSAC);
-           Mat MosaicMat=(Mat_<double>(3, 3) << 1.0, 0, cvImg1.cols, 0, 1.0, 0, 0, 0, 1.0);
-           Mat MosaicHomo=MosaicMat*Homo;
-           Point2f originalLinkPoint,targetLinkPoint,basedImgPoint;
-           originalLinkPoint = keyPoints1[goodMatches[0].queryIdx].pt;
-           targetLinkPoint = getTransformPoint(originalLinkPoint, MosaicHomo);
-           basedImgPoint = keyPoints2[goodMatches[0].trainIdx].pt;
-           warpPerspective(cvImg1, resultImg, MosaicHomo, Size(cvImg2.cols + cvImg1.cols + 10, cvImg2.rows));
-           Mat ROIMat = cvImg2(Rect(Point(basedImgPoint.x, 0), Point(cvImg2.cols, cvImg2.rows)));
-           ROIMat.copyTo(Mat(resultImg, Rect(targetLinkPoint.x, 0, cvImg2.cols - basedImgPoint.x + 1, cvImg2.rows)));
-       }
-       imshow("Image Mosaic",resultImg);
+          }
+         vector <KeyPoint> good_keyPoints1, good_keyPoints2;
+         for (size_t i = 0; i < goodMatches.size(); i++)
+         {
+             good_keyPoints1.push_back(keyPoints1[goodMatches[i].queryIdx]);
+             good_keyPoints2.push_back(keyPoints2[goodMatches[i].trainIdx]);
+          }
+          vector<Point2f> points_1,points_2;
+          for (size_t i = 0; i < goodMatches.size(); i++)
+          {
+              points_1.push_back(good_keyPoints1[i].pt);
+              points_2.push_back(good_keyPoints2[i].pt);
+          }
+          Mat Homo = findHomography(points_1, points_2, 0);
+          Mat MosaicMat=(Mat_<double>(3, 3) << 1.0, 0, cvImg1.cols, 0, 1.0, 0, 0, 0, 1.0);
+          Mat MosaicHomo=MosaicMat*Homo;
+          Point2f originalLinkPoint,targetLinkPoint,basedImgPoint;
+          originalLinkPoint = keyPoints1[goodMatches[0].queryIdx].pt;
+          targetLinkPoint = getTransformPoint(originalLinkPoint, MosaicHomo);
+          basedImgPoint = keyPoints2[goodMatches[0].trainIdx].pt;
+          warpPerspective(cvImg1, resultImg, MosaicHomo, Size(cvImg2.cols + cvImg1.cols + 10, cvImg2.rows));
+          Mat ROIMat = cvImg2(Rect(Point(basedImgPoint.x, 0), Point(cvImg2.cols, cvImg2.rows)));
+          ROIMat.copyTo(Mat(resultImg, Rect(targetLinkPoint.x, 0, cvImg2.cols - basedImgPoint.x + 1, cvImg2.rows)));
+    }
+    else
+    {
+        vector<KeyPoint> rand_keyPoints1,rand_keyPoints2;
+        vector<DMatch> goodMatches,rand_matches;
+        vector<Point2f> points_1,points_2;
+        RANSAC(keyPoints1,keyPoints2,matches,goodMatches,rand_keyPoints1,rand_keyPoints2,rand_matches,points_1,points_2);
+        Mat Homo = findHomography(points_1, points_2, FM_RANSAC);
+        Mat MosaicMat=(Mat_<double>(3, 3) << 1.0, 0, cvImg1.cols, 0, 1.0, 0, 0, 0, 1.0);
+        Mat MosaicHomo=MosaicMat*Homo;
+        Point2f originalLinkPoint,targetLinkPoint,basedImgPoint;
+        originalLinkPoint = keyPoints1[goodMatches[0].queryIdx].pt;
+        targetLinkPoint = getTransformPoint(originalLinkPoint, MosaicHomo);
+        basedImgPoint = keyPoints2[goodMatches[0].trainIdx].pt;
+        warpPerspective(cvImg1, resultImg, MosaicHomo, Size(cvImg2.cols + cvImg1.cols + 10, cvImg2.rows));
+        Mat ROIMat = cvImg2(Rect(Point(basedImgPoint.x, 0), Point(cvImg2.cols, cvImg2.rows)));
+        ROIMat.copyTo(Mat(resultImg, Rect(targetLinkPoint.x, 0, cvImg2.cols - basedImgPoint.x + 1, cvImg2.rows)));
+    }
+    imshow("Image Mosaic",resultImg);
 }
 
 void ImageProcess::targetDetect(int featureSelectionIndex,int featureMatchIndex,bool RANSAC_on,QImage qimg1,QImage qimg2,int Hessian)
@@ -381,6 +381,7 @@ Mat ImageProcess::preprocessImg(Mat srcImg)
         return srcImg_gray;
     }
 }
+
 Point2f ImageProcess::getTransformPoint(const Point2f originalPoint, const Mat &transformMatrix)
 {
     Mat originalP,targetP;

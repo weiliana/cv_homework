@@ -6,6 +6,7 @@
 #include "utils.h"
 #include <QDebug>
 #include <QImageReader>
+#include <QMessageBox>
 #include <QFileDialog>
 #include <opencv2/opencv.hpp>
 #include <opencv2/xfeatures2d.hpp>
@@ -132,31 +133,116 @@ void MainWindow::on_FERNS_btn_clicked()
 
 void MainWindow::on_imageMosaic_btn_clicked()
 {
-    UT->setMsg("image mosaic is running...");
-    ImageProcess::imageMosaic(featureSelectionIndex,featureMatchIndex,is_RANSAC_checked,image1,image2,Hessian);
-    UT->setMsg("image mosaic is finished!");
+    if(image1.isNull())
+    {
+        UT->setMsg("Process failed because Image1 is null!Please choose one image.");
+        return;
+    }
+    else if(image2.isNull())
+    {
+        UT->setMsg("Process failed because Image2 is null!Please choose one image.");
+        return;
+    }
+    else
+    {
+        UT->setMsg("Image mosaic is running...");
+        double beginTime=clock();
+        ImageProcess::imageMosaic(featureSelectionIndex,featureMatchIndex,is_RANSAC_checked,image1,image2,Hessian);
+        double endTime=clock();
+        double ProcessTime=(endTime - beginTime)/CLOCKS_PER_SEC*1000;
+        UT->setMsg("Image mosaic is finished!");
+        UT->setMsg("Process Time:"+QString::number(ProcessTime,10,2)+"ms");
+        QMessageBox messageBox(QMessageBox::NoIcon,QString::fromLocal8Bit("拼接完成"),QString::fromLocal8Bit("结果是否正确"),QMessageBox::Yes|QMessageBox::No);
+        int msgBox=messageBox.exec();
+        if(msgBox==QMessageBox::No)
+        {
+            cv::destroyWindow("Image Mosaic");
+            beginTime=clock();
+            ImageProcess::imageMosaic(featureSelectionIndex,featureMatchIndex,is_RANSAC_checked,image2,image1,Hessian);
+            endTime=clock();
+            ProcessTime=(endTime - beginTime)/CLOCKS_PER_SEC*1000;
+            UT->setMsg("Image mosaic is finished!");
+            UT->setMsg("Process Time:"+QString::number(ProcessTime,10,2)+"ms");
+            if(!is_RANSAC_checked)
+                QMessageBox::information(NULL,QString::fromLocal8Bit("提示"),QString::fromLocal8Bit("如果结果仍不正确请勾选RANSAC后再次尝试"));
+        }
+    }
 }
 
 void MainWindow::on_geometricCorrection_btn_clicked()
 {
-    UT->setMsg("geometricCorrection is running...");
-    ImageProcess::geometricCorrection(featureSelectionIndex,featureMatchIndex,is_RANSAC_checked,image1,image2,Hessian);
-    UT->setMsg("geometricCorrection is finished!");
+    if(image1.isNull())
+    {
+        UT->setMsg("Process failed because Image1 is null!Please choose one image.");
+        return;
+    }
+    else if(image2.isNull())
+    {
+        UT->setMsg("Process failed because Image2 is null!Please choose one image.");
+        return;
+    }
+    else
+    {
+        UT->setMsg("GeometricCorrection is running...");
+        double beginTime=clock();
+        ImageProcess::geometricCorrection(featureSelectionIndex,featureMatchIndex,is_RANSAC_checked,image1,image2,Hessian);
+        double endTime=clock();
+        double ProcessTime=(endTime - beginTime)/CLOCKS_PER_SEC*1000;
+        UT->setMsg("GeometricCorrection is finished!");
+        UT->setMsg("Process Time:"+QString::number(ProcessTime,10,2)+"ms");
+        if(!is_RANSAC_checked)
+            QMessageBox::information(NULL,QString::fromLocal8Bit("几何矫正完成"),QString::fromLocal8Bit("如果结果不正确请勾选RANSAC后再次尝试"));
+    }
 }
 
 void MainWindow::on_targetDetect_btn_clicked()
 {
-    UT->setMsg("target detect is running...");
-    ImageProcess::targetDetect(featureSelectionIndex,featureMatchIndex,is_RANSAC_checked,image1,image2,Hessian);
-    UT->setMsg("target detect is finished!");
+    if(image1.isNull())
+    {
+        UT->setMsg("Process failed because Image1 is null!Please choose one image.");
+        return;
+    }
+    else if(image2.isNull())
+    {
+        UT->setMsg("Process failed because Image2 is null!Please choose one image.");
+        return;
+    }
+    else
+    {
+        UT->setMsg("Target detection is running...");
+        double beginTime=clock();
+        ImageProcess::targetDetect(featureSelectionIndex,featureMatchIndex,is_RANSAC_checked,image1,image2,Hessian);
+        double endTime=clock();
+        double ProcessTime=(endTime - beginTime)/CLOCKS_PER_SEC*1000;
+        UT->setMsg("Target detection is finished!");
+        UT->setMsg("Process Time:"+QString::number(ProcessTime,10,2)+"ms");
+    }
 }
 
 void MainWindow::on_point2point_btn_clicked()
 {
-    UT->setMsg("point2point is running...");
-    ImageProcess::point2point(featureSelectionIndex,featureMatchIndex,is_RANSAC_checked,image1,image2,Hessian);
-    UT->setMsg("point2point is finished!");
+    if(image1.isNull())
+    {
+        UT->setMsg("Process failed because Image 1 is null!Please choose one image.");
+        return;
+    }
+    else if(image2.isNull())
+    {
+        UT->setMsg("Process failed because Image 2 is null!Please choose one image.");
+        return;
+    }
+    else
+    {
+        UT->setMsg("Point2point is running...");
+        double beginTime=clock();
+        ImageProcess::point2point(featureSelectionIndex,featureMatchIndex,is_RANSAC_checked,image1,image2,Hessian);
+        double endTime=clock();
+        double ProcessTime=(endTime - beginTime)/CLOCKS_PER_SEC*1000;
+        UT->setMsg("Point2point is finished!");
+        UT->setMsg("Process Time:"+QString::number(ProcessTime,10,2)+"ms");
+    }
 }
+
 
 void MainWindow::on_videoProcess_btn_clicked()
 {
