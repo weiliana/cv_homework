@@ -27,7 +27,7 @@ void ImageProcess::point2point(int featureSelectionIndex,int featureMatchIndex,b
         RANSAC(keyPoints1,keyPoints2,matches,goodMatches,rand_keyPoints1,rand_keyPoints2,rand_matches,points_1,points_2);
         drawMatches(cvImg1,rand_keyPoints1,cvImg2,rand_keyPoints2,rand_matches,resultImg);
     }
-    imshow("Point to point",resultImg);
+    imshow("Point To Point Result",resultImg);
 }
 
 void ImageProcess::geometricCorrection(int featureSelectionIndex,int featureMatchIndex,bool RANSAC_on,QImage qimg1,QImage qimg2,int Hessian)
@@ -85,7 +85,7 @@ void ImageProcess::geometricCorrection(int featureSelectionIndex,int featureMatc
         Mat Homo = findHomography(points_2, points_1, FM_RANSAC);
         warpPerspective(cvImg2, resultImg, Homo, Size(cvImg1.size().width, cvImg1.size().height));
     }
-    imshow("Geometric Correction",resultImg);
+    imshow("Geometric Correction Result",resultImg);
 }
 
 void ImageProcess::imageMosaic(int featureSelectionIndex,int featureMatchIndex,bool RANSAC_on,QImage qimg1,QImage qimg2,int Hessian)
@@ -159,7 +159,7 @@ void ImageProcess::imageMosaic(int featureSelectionIndex,int featureMatchIndex,b
         Mat ROIMat = cvImg2(Rect(Point(basedImgPoint.x, 0), Point(cvImg2.cols, cvImg2.rows)));
         ROIMat.copyTo(Mat(resultImg, Rect(targetLinkPoint.x, 0, cvImg2.cols - basedImgPoint.x + 1, cvImg2.rows)));
     }
-    imshow("Image Mosaic",resultImg);
+    imshow("Image Mosaic Result",resultImg);
 }
 
 void ImageProcess::targetDetect(int featureSelectionIndex,int featureMatchIndex,bool RANSAC_on,QImage qimg1,QImage qimg2,int Hessian)
@@ -247,7 +247,7 @@ void ImageProcess::targetDetect(int featureSelectionIndex,int featureMatchIndex,
         line(resultImg, sceneCorners[2] + Point2f(cvImg1.cols, 0), sceneCorners[3] + Point2f(cvImg1.cols, 0), Scalar(0, 255, 0), 4);
         line(resultImg, sceneCorners[3] + Point2f(cvImg1.cols, 0), sceneCorners[0] + Point2f(cvImg1.cols, 0), Scalar(0, 255, 0), 4);
     }
-    imshow("Target Detection", resultImg);
+    imshow("Target Detection Result", resultImg);
 }
 
 void ImageProcess::sift(Mat cvImg1,Mat cvImg2,int Hessian,vector<KeyPoint> &keyPoints1,vector<KeyPoint> &keyPoints2,Mat &imageDesc1,Mat &imageDesc2)
@@ -312,7 +312,6 @@ void ImageProcess::RANSAC(vector<KeyPoint> keyPoints1,vector<KeyPoint> keyPoints
             goodMatches.push_back(matches[m]);
         }
     }
-
     //RANSAC匹配过程
     vector<DMatch> old_matches=goodMatches;
     //坐标转换为float类型

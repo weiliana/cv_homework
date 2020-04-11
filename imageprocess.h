@@ -26,7 +26,7 @@ public:
     static void RANSAC(vector<KeyPoint> keyPoints1,vector<KeyPoint> keyPoints2,vector<DMatch> matches,vector<DMatch> &goodMatches,vector<KeyPoint> &new_rand_keypoint1,vector<KeyPoint> &new_rand_keypoint2,vector <DMatch> &new_matches,vector<Point2f> &points_1,vector<Point2f> &points_2);
     static void commonProcess(int featureSelectionIndex,int featureMatchIndex,Mat cvImg1,Mat cvImg2,Mat &resultImg,int Hessian,vector<KeyPoint> &keyPoints1,vector<KeyPoint> &keyPoints2,vector<DMatch> &matches);
 
-    static  Mat preprocessImg(Mat srcImg);
+    static Mat preprocessImg(Mat srcImg);
     static Point2f getTransformPoint(const Point2f originalPoint,const Mat & transformMatrix);
 };
 
