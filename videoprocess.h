@@ -16,11 +16,12 @@ public:
     static void setVideoStatus(bool isOn);
     static void setVideoSpeed(int waitTime);
     static void setVideoStepProc(bool isStep);
+    static void setVideoLineBox(bool hasLineBox);
     static void videoCheckSynchronized(QString imagePath, QString videoPath, bool useCamera = false);//返回值类型未知，参数类型个数未知..
 
 private:
     // opencv中有可以调用的函数时，用opencv的进行替换
-    static void mRANSAC(vector<KeyPoint> &target, vector<KeyPoint> &scene, vector<DMatch> &matches);
+    static void mRANSAC(vector<KeyPoint> &target, vector<KeyPoint> &scene, vector<DMatch> &matches, Mat& homo);
     static void goodMatch(vector<DMatch> &matches);
 };
 

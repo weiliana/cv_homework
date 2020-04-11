@@ -5,6 +5,7 @@
 #include "methodvalidate.h"
 #include "utils.h"
 #include <QDebug>
+#include <QImageReader>
 #include <QFileDialog>
 #include <opencv2/opencv.hpp>
 #include <opencv2/xfeatures2d.hpp>
@@ -44,8 +45,11 @@ void MainWindow::on_fImgOpen_btn_clicked()//打开第一个图片
                                                  "Image Files(*.jpg *.png *.bmp *.pgm *.pbm);;All(*.*)");
     if(OpenFile!="")
     {
-        if(image1.load(OpenFile))
+        QImageReader reader(OpenFile);
+        reader.setDecideFormatFromContent(true);
+        if(reader.canRead())
         {
+            reader.read(&image1);
             Mat matImage=Utils::QImage2cvMat(image1);
             imshow("image1",matImage);
             //show file path
@@ -65,8 +69,11 @@ void MainWindow::on_fImgOpen2_btn_clicked()
                                                  "Image Files(*.jpg *.png *.bmp *.pgm *.pbm);;All(*.*)");
     if(OpenFile!="")
     {
-        if(image2.load(OpenFile))
+        QImageReader reader(OpenFile);
+        reader.setDecideFormatFromContent(true);
+        if(reader.canRead())
         {
+            reader.read(&image2);
             Mat matImage=Utils::QImage2cvMat(image2);
             imshow("image2",matImage);
             //show file path
@@ -271,6 +278,12 @@ void MainWindow::on_videoOpen_btn_clicked()
         capture.release();
     }
 
+}
+
+void MainWindow::on_videoObjLine_checkBox_stateChanged(int arg1)
+{
+    //qDebug()<<arg1;
+    VideoProcess::setVideoLineBox(arg1 == 0? false:true);
 }
 
 

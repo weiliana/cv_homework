@@ -32,6 +32,7 @@ public:
 
     //将MAT类型图片转换为QImage
     static QImage cvMat2QImage(const Mat& mat);
+
 };
 
 // 获取单例对象

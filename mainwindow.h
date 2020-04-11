@@ -58,5 +58,6 @@ private slots:
     void on_videoContinue_btn_clicked();
     void on_videoStepProcess_btn_clicked();
     void on_videoSpeed_slider_valueChanged(int value);
+    void on_videoObjLine_checkBox_stateChanged(int arg1);
 };
 #endif // MAINWINDOW_H
