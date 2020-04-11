@@ -14,6 +14,8 @@ public:
     VideoProcess();
     static bool getVideoStatus();
     static void setVideoStatus(bool isOn);
+    static void setVideoSpeed(int waitTime);
+    static void setVideoStepProc(bool isStep);
     static void videoCheckSynchronized(QString imagePath, QString videoPath, bool useCamera = false);//返回值类型未知，参数类型个数未知..
 
 private:

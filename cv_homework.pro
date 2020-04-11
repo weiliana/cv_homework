@@ -20,6 +20,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     methodvalidate.cpp \
+    utils.cpp \
     videoprocess.cpp
 
 HEADERS += \

@@ -29,9 +29,6 @@ public:
     QString videoPath;          //视频路径
     QString videoMacthTargetPath;
 
-    void setMsg(QString msg);   //向文本框输出信息
-
-
 private:
     Ui::MainWindow *ui;
 
@@ -59,5 +56,7 @@ private slots:
     void on_videoTargetImg_btn_clicked();
     void on_useCamera_btn_clicked();
     void on_videoContinue_btn_clicked();
+    void on_videoStepProcess_btn_clicked();
+    void on_videoSpeed_slider_valueChanged(int value);
 };
 #endif // MAINWINDOW_H

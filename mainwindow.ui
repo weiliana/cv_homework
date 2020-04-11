@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>730</width>
-    <height>614</height>
+    <width>610</width>
+    <height>503</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_1">
        <property name="font">
@@ -450,13 +450,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="useCamera_btn">
-            <property name="text">
-             <string>使用摄像头</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <spacer name="horizontalSpacer_6">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -470,23 +463,75 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="videoContinue_btn">
+           <widget class="QPushButton" name="useCamera_btn">
             <property name="text">
-             <string>继续/暂停</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="videoStepProcess_btn">
-            <property name="text">
-             <string>逐帧处理</string>
+             <string>使用摄像头</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="videoProcess_btn">
             <property name="text">
-             <string>正常处理</string>
+             <string>视频处理</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_10">
+          <item>
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>播放速度</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>快</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="videoSpeed_slider">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>慢</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_7">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="videoStepProcess_btn">
+            <property name="text">
+             <string>逐帧显示</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="videoContinue_btn">
+            <property name="text">
+             <string>继续/暂停</string>
             </property>
            </widget>
           </item>

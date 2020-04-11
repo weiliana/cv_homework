@@ -9,7 +9,9 @@ using namespace cv::xfeatures2d;
 using namespace std;
 
 #define RATIO 0.4
-static bool IsVideoOn = false;
+static bool IsVideoOn = false;      // 视频是否处于播放状态
+static bool IsSetpProc = false;     // 是否逐帧处理
+static unsigned int waitTime = 1;   // 播放时每一帧延迟时间
 
 VideoProcess::VideoProcess()
 {
@@ -26,10 +28,21 @@ void VideoProcess::setVideoStatus(bool isOn)
     IsVideoOn = isOn;
 }
 
+void VideoProcess::setVideoSpeed(int wTime)
+{
+    waitTime = wTime;
+}
+
+void VideoProcess::setVideoStepProc(bool isStep)
+{
+    IsSetpProc = isStep;
+}
+
 void VideoProcess::videoCheckSynchronized(QString imagePath, QString videoPath, bool useCamera)
 {
     // 测试ORB
     Mat target;
+    QString outStr;
     target = imread(Utils::qstr2str(imagePath));
     //Mat frame = imread("E:/picture/ORBtest_scene.png");
     VideoCapture capture;
@@ -49,8 +62,6 @@ void VideoProcess::videoCheckSynchronized(QString imagePath, QString videoPath, 
     // 特征检测
     while(1)
     {
-        //qDebug()<<"running...";
-        qDebug()<<"video is on: "<<IsVideoOn;
         t = (double)getTickCount();
         if(IsVideoOn)
         {
@@ -74,26 +85,33 @@ void VideoProcess::videoCheckSynchronized(QString imagePath, QString videoPath, 
         // Brute-force匹配
         //BFMatcher matcher;
         matcher->match(descriptors_target, descriptors_scene, matches);
+        outStr.sprintf("Total match points: %d" , matches.size());
+        UT->setMsg(outStr);
         //qDebug()<<"total match points: " << matches.size();
         // 筛选出较好的匹配点
         // goodMatch
         goodMatch(matches);
         // RANSAC
         //mRANSAC(keypoints_target,keypoints_scene,matches);
-        qDebug()<<"good match points: " << matches.size();
+        outStr.sprintf("Good match points: %d" , matches.size());
+        UT->setMsg(outStr);
+        //qDebug()<<"good match points: " << matches.size();
         Mat dst;
         drawMatches(target, keypoints_target, frame, keypoints_scene, matches, dst);
 
         t = ((double)getTickCount() - t) / getTickFrequency();
+        t += (double)waitTime / 1000.0;
         fps = 1.0 / t;
         sprintf(string, "%.2f", fps);
         fpsStr = String("FPS:") + string;
         putText(dst, fpsStr, Point(5,20), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,255,255));
         imshow(winName, dst);
-        waitKey(1);  // 延迟
+        waitKey(waitTime);  // 延迟
+        if(IsSetpProc){ IsVideoOn = false; IsSetpProc = false; }
         }
-        else waitKey(10);
-        t++;
+
+        else waitKey(30);
+
         if(getWindowProperty(winName,0) == -1)
         {
             IsVideoOn = false;

@@ -18,12 +18,16 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     this->setWindowTitle("CV-Homework");
+    UT->ui = ui;
     featureSelectionIndex=ui->featureSelection_cmb->currentIndex();
     featureMatchIndex=ui->featureMatch_cmb->currentIndex();
     videoProcIndex=ui->videoDetectFunc_cmb->currentIndex();
+    ui->videoSpeed_slider->setMinimum(1);
+    ui->videoSpeed_slider->setMaximum(500);
+    ui->videoSpeed_slider->setValue(1);
     Hessian=100;
     is_RANSAC_checked=ui->ransacCheckBox->isChecked();
-    this->setMsg("Program running successfully!");
+    UT->setMsg("Program running successfully!");
 }
 
 MainWindow::~MainWindow()
@@ -49,7 +53,7 @@ void MainWindow::on_fImgOpen_btn_clicked()//打开第一个图片
             OpenFileInfo=QFileInfo(OpenFile);
             OpenFilePath=OpenFileInfo.filePath();
             ui->ImagePath1->setText(OpenFilePath);
-            setMsg("first picture has opened.");
+            UT->setMsg("first picture has opened.");
         }
     }
 }
@@ -70,17 +74,9 @@ void MainWindow::on_fImgOpen2_btn_clicked()
             OpenFileInfo=QFileInfo(OpenFile);
             OpenFilePath=OpenFileInfo.filePath();
             ui->ImagePath2->setText(OpenFilePath);
-            setMsg("second picture has opened.");
+            UT->setMsg("second picture has opened.");
         }
     }
-}
-
-void MainWindow::setMsg(QString msg)
-{
-    QString Msg=ui->log->toPlainText();
-    Msg.append(msg);
-    Msg.append("\n");
-    ui->log->setPlainText(Msg);
 }
 
 void MainWindow::on_featureSelection_cmb_currentIndexChanged(int index)
@@ -110,7 +106,7 @@ void MainWindow::on_ransacCheckBox_stateChanged()
 
 void MainWindow::on_FERNS_btn_clicked()
 {
-    setMsg("verifying FERNS...");
+    UT->setMsg("verifying FERNS...");
     switch(featureSelectionIndex)
     {
     case 0:
@@ -124,45 +120,56 @@ void MainWindow::on_FERNS_btn_clicked()
     }
 
     MethodValidate::FERNS_Verify();
-    setMsg("verifying FERNS is finished!");
+    UT->setMsg("verifying FERNS is finished!");
 }
 
 void MainWindow::on_imageMosaic_btn_clicked()
 {
-    setMsg("image mosaic is running...");
+    UT->setMsg("image mosaic is running...");
     ImageProcess::imageMosaic();
-    setMsg("image mosaic is finished!");
+    UT->setMsg("image mosaic is finished!");
 }
 
 void MainWindow::on_geometricCorrection_btn_clicked()
 {
-    setMsg("geometricCorrection is running...");
+    UT->setMsg("geometricCorrection is running...");
     ImageProcess::geometricCorrection(featureSelectionIndex,featureMatchIndex,is_RANSAC_checked,image1,image2,Hessian);
-    setMsg("geometricCorrection is finished!");
+    UT->setMsg("geometricCorrection is finished!");
 }
 
 void MainWindow::on_targetDetect_btn_clicked()
 {
-    setMsg("target detect is running...");
+    UT->setMsg("target detect is running...");
     ImageProcess::targetDetect(featureSelectionIndex,featureMatchIndex,is_RANSAC_checked,image1,image2,Hessian);
-    setMsg("target detect is finished!");
+    UT->setMsg("target detect is finished!");
 }
 
 void MainWindow::on_point2point_btn_clicked()
 {
-    setMsg("point2point is running...");
+    UT->setMsg("point2point is running...");
     ImageProcess::point2point(featureSelectionIndex,featureMatchIndex,is_RANSAC_checked,image1,image2,Hessian);
-    setMsg("point2point is finished!");
+    UT->setMsg("point2point is finished!");
 }
 
 void MainWindow::on_videoProcess_btn_clicked()
 {
-    setMsg("video function is running...");
+    UT->setMsg("video function is running...");
     VideoProcess::setVideoStatus(true);
-    VideoProcess::videoCheckSynchronized(videoMacthTargetPath, videoPath);
-    setMsg("video function is finished!");
+    if(videoPath.isEmpty() || videoMacthTargetPath.isEmpty())
+        UT->setMsg("video or image is null!");
+    else
+    {
+        VideoProcess::videoCheckSynchronized(videoMacthTargetPath, videoPath);
+        UT->setMsg("video function is finished!");
+    }
 }
 
+void MainWindow::on_videoStepProcess_btn_clicked()
+{
+    // TODO
+    VideoProcess::setVideoStatus(true);
+    VideoProcess::setVideoStepProc(true);
+}
 
 void MainWindow::on_videoContinue_btn_clicked()
 {
@@ -172,10 +179,20 @@ void MainWindow::on_videoContinue_btn_clicked()
 
 void MainWindow::on_useCamera_btn_clicked()
 {
-    setMsg("video function is running...");
+    UT->setMsg("video function is running...");
     VideoProcess::setVideoStatus(true);
-    VideoProcess::videoCheckSynchronized(videoMacthTargetPath, videoPath, true);
-    setMsg("video function is finished!");
+    if(videoMacthTargetPath.isEmpty())
+        UT->setMsg("video match target image is null!");
+    else
+    {
+        VideoProcess::videoCheckSynchronized(videoMacthTargetPath, videoPath, true);
+        UT->setMsg("video function is finished!");
+    }
+}
+
+void MainWindow::on_videoSpeed_slider_valueChanged(int value)
+{
+    VideoProcess::setVideoSpeed(value);
 }
 
 void MainWindow::on_videoDetectFunc_cmb_currentIndexChanged(int index)
@@ -213,7 +230,7 @@ void MainWindow::on_videoTargetImg_btn_clicked()
         Mat img = imread(Utils::qstr2str(openFilePath));
         videoMacthTargetPath = openFilePath;
         imshow("target image", img);
-        setMsg("video file has opened.");
+        UT->setMsg("video file has opened.");
 
     }
 }
@@ -232,7 +249,7 @@ void MainWindow::on_videoOpen_btn_clicked()
         OpenFileInfo=QFileInfo(openFile);
         openFilePath=OpenFileInfo.filePath();
         ui->videoPath->setText(openFilePath);
-        setMsg("video file has opened.");
+        UT->setMsg("video file has opened.");
         videoPath = openFilePath;
 
         VideoCapture capture(Utils::qstr2str(openFilePath));
@@ -261,7 +278,7 @@ void MainWindow::on_testFeatureSelection_btn_clicked()
 {
     if(image1.isNull())
     {
-        this->setMsg("Image 1 is null!");
+        UT->setMsg("Image 1 is null!");
         return;
     }
     String path = Utils::qstr2str(ui->ImagePath1->text());
