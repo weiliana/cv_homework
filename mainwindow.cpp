@@ -133,7 +133,7 @@ void MainWindow::on_FERNS_btn_clicked()
 void MainWindow::on_imageMosaic_btn_clicked()
 {
     UT->setMsg("image mosaic is running...");
-    ImageProcess::imageMosaic();
+    ImageProcess::imageMosaic(featureSelectionIndex,featureMatchIndex,is_RANSAC_checked,image1,image2,Hessian);
     UT->setMsg("image mosaic is finished!");
 }
 
