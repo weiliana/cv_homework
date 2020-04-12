@@ -36,6 +36,7 @@ string Utils::qstr2str(const QString qstr)
 Mat Utils::QImage2cvMat(QImage image)
 {
     cv::Mat mat;
+    qDebug()<<"format:"<<image.format();
     switch (image.format())
     {
     case QImage::Format_ARGB32:
@@ -47,7 +48,8 @@ Mat Utils::QImage2cvMat(QImage image)
         mat = cv::Mat(image.height(), image.width(), CV_8UC3, (void*)image.constBits(), image.bytesPerLine());
         cv::cvtColor(mat, mat, CV_BGR2RGB);
         break;
-    case QImage::Format_Indexed8:
+    //case QImage::Format_Indexed8:
+    case QImage::Format_Grayscale8:
         mat = cv::Mat(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
         break;
     }
@@ -60,7 +62,7 @@ QImage Utils::cvMat2QImage(const Mat& mat)
     switch (mat.type()) {
     case CV_8UC1:
     {
-        QImage image(mat.cols, mat.rows, QImage::Format_Indexed8);
+        QImage image(mat.cols, mat.rows, QImage::Format_Grayscale8);
         // Set the color table (used to translate colour indexes to qRgb values)
         image.setColorCount(256);
         for(int i = 0; i < 256; i++)
