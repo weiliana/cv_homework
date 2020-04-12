@@ -24,6 +24,7 @@ public:
     int featureSelectionIndex;  //指示当前特征提取用的是哪个方法
     int featureMatchIndex;      //指示当前特征提取用的是哪个方法
     int videoProcIndex;
+    bool videoUseCUDA;
     int Hessian;
     bool is_RANSAC_checked;     //指示要不要去除野点
     QString videoPath;          //视频路径
@@ -59,5 +60,6 @@ private slots:
     void on_videoStepProcess_btn_clicked();
     void on_videoSpeed_slider_valueChanged(int value);
     void on_videoObjLine_checkBox_stateChanged(int arg1);
+    void on_useVideoCUDA_stateChanged(int arg1);
 };
 #endif // MAINWINDOW_H

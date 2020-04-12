@@ -29,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->videoSpeed_slider->setValue(1);
     Hessian=100;
     is_RANSAC_checked=ui->ransacCheckBox->isChecked();
+    videoUseCUDA = false;
     UT->setMsg("Program running successfully!");
 }
 
@@ -252,7 +253,10 @@ void MainWindow::on_videoProcess_btn_clicked()
         UT->setMsg("video or image is null!");
     else
     {
-        VideoProcess::videoCheckSynchronized(videoMacthTargetPath, videoPath);
+        if(videoUseCUDA)
+            VideoProcess::videoORBtoCUDAProc(videoMacthTargetPath, videoPath);
+        else
+            VideoProcess::videoCheckSynchronized(videoMacthTargetPath, videoPath);
         UT->setMsg("video function is finished!");
     }
 }
@@ -278,9 +282,17 @@ void MainWindow::on_useCamera_btn_clicked()
         UT->setMsg("video match target image is null!");
     else
     {
-        VideoProcess::videoCheckSynchronized(videoMacthTargetPath, videoPath, true);
+        if(videoUseCUDA)
+            VideoProcess::videoORBtoCUDAProc(videoMacthTargetPath, videoPath, true);
+        else
+            VideoProcess::videoCheckSynchronized(videoMacthTargetPath, videoPath, true);
         UT->setMsg("video function is finished!");
     }
+}
+
+void MainWindow::on_useVideoCUDA_stateChanged(int arg1)
+{
+    videoUseCUDA = arg1 == 0? false: true;
 }
 
 void MainWindow::on_videoSpeed_slider_valueChanged(int value)

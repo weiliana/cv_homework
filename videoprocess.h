@@ -17,7 +17,8 @@ public:
     static void setVideoSpeed(int waitTime);
     static void setVideoStepProc(bool isStep);
     static void setVideoLineBox(bool hasLineBox);
-    static void videoCheckSynchronized(QString imagePath, QString videoPath, bool useCamera = false);//返回值类型未知，参数类型个数未知..
+    static void videoCheckSynchronized(QString imagePath, QString videoPath, bool useCamera = false);
+    static void videoORBtoCUDAProc(QString imagePath, QString videoPath, bool useCamera = false);
 
 private:
     // opencv中有可以调用的函数时，用opencv的进行替换

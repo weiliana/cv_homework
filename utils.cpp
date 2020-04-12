@@ -103,4 +103,3 @@ QImage Utils::cvMat2QImage(const Mat& mat)
     }
 }
 
-

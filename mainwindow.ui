@@ -450,6 +450,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QCheckBox" name="useVideoCUDA">
+            <property name="text">
+             <string>CUDA加速</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QCheckBox" name="videoObjLine_checkBox">
             <property name="text">
              <string>物体线框</string>

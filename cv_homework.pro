@@ -38,9 +38,14 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+CUDA_DIR  = "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.2"
+
 INCLUDEPATH += \
     D:/new_opencv4.2.0/opencv/include \
-    D:/new_opencv4.2.0/opencv/include/opencv2
+    D:/new_opencv4.2.0/opencv/include/opencv2 \
+    $$CUDA_DIR/include
+
+QMAKE_LIBDIR += $$CUDA_DIR/lib/x64
 
 LIBS += \
 D:\new_opencv4.2.0\opencv\x64\vc15\lib\opencv_aruco420.lib \
