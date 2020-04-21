@@ -20,15 +20,18 @@ public:
     QImage image1;
     QImage image2;
     QImage result;
-
     int featureSelectionIndex;  //指示当前特征提取用的是哪个方法
-    int featureMatchIndex;      //指示当前特征提取用的是哪个方法
-    int videoProcIndex;
-    bool videoUseCUDA;
+    int featureMatchIndex;      //指示当前特征匹配用的是哪个方法
     int Hessian;
     bool is_RANSAC_checked;     //指示要不要去除野点
+
+    int videoProcIndex;
+    bool videoUseCUDA;
     QString videoPath;          //视频路径
     QString videoMacthTargetPath;
+
+    int trackerType;            // 跟踪器类型
+    QString videoForTrackPath;   // 目标跟踪视频文件
 
 private:
     Ui::MainWindow *ui;
@@ -51,9 +54,6 @@ private slots:
     void on_videoDetectFunc_cmb_currentIndexChanged(int index);//用什么方法处理视频
     void on_videoPath_returnPressed();
     void on_videoOpen_btn_clicked();    //输入视频
-    void on_testFeatureSelection_btn_clicked();
-    void on_testRANSAC_btn_clicked();
-    void on_testFeatureMatch_btn_clicked();
     void on_videoTargetImg_btn_clicked();
     void on_useCamera_btn_clicked();
     void on_videoContinue_btn_clicked();
@@ -61,5 +61,10 @@ private slots:
     void on_videoSpeed_slider_valueChanged(int value);
     void on_videoObjLine_checkBox_stateChanged(int arg1);
     void on_useVideoCUDA_stateChanged(int arg1);
+
+    void on_videoTrack_btn_clicked();
+    void on_comboBox_currentIndexChanged(int index);
+    void on_trackerProcess_btn_clicked();
+    void on_trackingContinue_btn_clicked();
 };
 #endif // MAINWINDOW_H

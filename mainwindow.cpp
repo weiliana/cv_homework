@@ -30,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent)
     Hessian=100;
     is_RANSAC_checked=ui->ransacCheckBox->isChecked();
     videoUseCUDA = false;
+
+    trackerType = ui->trackerType_cmb->currentIndex();
     UT->setMsg("Program running successfully!");
 }
 
@@ -385,49 +387,39 @@ void MainWindow::on_videoObjLine_checkBox_stateChanged(int arg1)
 }
 
 
-void MainWindow::on_testFeatureSelection_btn_clicked()
+/**
+ * 目标跟踪
+ */
+// 选择单个视频文件
+void MainWindow::on_videoTrack_btn_clicked()
 {
-    if(image1.isNull())
+    QString openFile,openFilePath;
+    openFile = QFileDialog::getOpenFileName(this,  "Please choose an video file", "",
+                                                 "Video Files(*.mp4 *.flv *.avi);;All(*.*)");
+    if(openFile!="")
     {
-        UT->setMsg("Image 1 is null!");
-        return;
+        //show file path
+        QFileInfo openFileInfo;
+        openFileInfo=QFileInfo(openFile);
+        openFilePath=openFileInfo.filePath();
+        ui->videoTrackPath->setText(openFilePath);
+        UT->setMsg("video for track file has opened.");
+        videoForTrackPath = openFilePath;
     }
-    String path = Utils::qstr2str(ui->ImagePath1->text());
-    Mat src = imread(path,IMREAD_GRAYSCALE);
-    //namedWindow("test feature", WINDOW_NORMAL);
-    imshow("Origin Image", src);
-
-    // 特征点检测
-    int minHessian = 100;
-    vector<KeyPoint> keyPoints;
-    String type;
-    if(featureSelectionIndex == 0)
-    {
-        // SIFT
-        type = "SIFT ";
-        Ptr<SIFT> detector = SIFT::create(minHessian);
-        detector->detect(src, keyPoints, Mat());
-    }
-    else if(featureSelectionIndex == 1)
-    {
-        // SURF
-        type = "SURF ";
-        Ptr<SURF> detector = SURF::create(minHessian);
-        detector->detect(src, keyPoints, Mat());
-    }
-    // 绘制关键点
-    Mat keypoint_img;
-    drawKeypoints(src, keyPoints, keypoint_img);
-    imshow(type + "KeyPoints Image", keypoint_img);
 }
-
-void MainWindow::on_testRANSAC_btn_clicked()
+// 跟踪器选择
+void MainWindow::on_comboBox_currentIndexChanged(int index)
+{
+    trackerType = index;
+    qDebug()<<"trackerType:"<<index;
+}
+// 视频目标跟踪处理
+void MainWindow::on_trackerProcess_btn_clicked()
 {
 
 }
-
-void MainWindow::on_testFeatureMatch_btn_clicked()
+// 视频目标跟踪暂停/继续
+void MainWindow::on_trackingContinue_btn_clicked()
 {
 
 }
-
